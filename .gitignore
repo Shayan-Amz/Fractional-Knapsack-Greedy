@@ -1,0 +1,19 @@
+# build output
+build/
+cmake-build-*/
+*.o
+*.obj
+*.exe
+*.out
+a.out
+
+# benchmark artefacts
+bench.csv
+
+# IDE / OS
+.vscode/
+.idea/
+.vs/
+*.swp
+.DS_Store
+Thumbs.db
