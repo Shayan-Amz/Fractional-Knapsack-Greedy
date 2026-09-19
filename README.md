@@ -10,30 +10,15 @@ small header-only C++17 library with a command-line front end, a proof of optima
 that checks the greedy answer against exhaustive enumeration, and a benchmark that contrasts it with
 the 0/1 variant — the classic example of where the same greedy idea *fails*.
 
-The project originates from an Algorithms course assignment ("Juice Happiness": fill a stomach of
-`V` litres from `n` juices, each with a volume and a happiness, drinking any fraction of a juice).
+The problem comes from an Algorithms course exercise ("Juice Happiness": fill a stomach of `V`
+litres from `n` juices, each with a volume and a happiness value, drinking any fraction of a juice) —
+the same problem in different clothing.
 
 <p align="center">
   <img src="docs/figures/bench.png" alt="Running time and integrality gap" width="900">
   <br>
   <sub>Left: greedy fractional solver vs. 0/1 dynamic programming. Right: how far the fractional optimum lies above the 0/1 optimum on random instances.</sub>
 </p>
-
----
-
-## Table of Contents
-
-1. [Problem](#problem)
-2. [Algorithm](#algorithm)
-3. [Proof of optimality](#proof-of-optimality)
-4. [Why the same greedy fails for 0/1 knapsack](#why-the-same-greedy-fails-for-01-knapsack)
-5. [Experiments](#experiments)
-6. [Usage](#usage)
-7. [Testing](#testing)
-8. [Project structure](#project-structure)
-9. [History](#history)
-10. [References](#references)
-11. [License](#license)
 
 ---
 
@@ -196,8 +181,8 @@ capacity used : 50 of 50
 maximum value : 240
 ```
 
-`--json` prints a machine-readable result, `--interactive` prompts for the input as the original
-course program did, and an instance can also be piped on stdin.
+`--json` prints a machine-readable result, `--interactive` asks for the instance on the terminal, and
+an instance can also be piped on stdin.
 
 ### Library
 
@@ -208,7 +193,7 @@ std::vector<knapsack::Item> items = {{10, 60}, {20, 100}, {30, 120}};   // {weig
 knapsack::Solution s = knapsack::solve(items, 50);
 
 s.total_value;    // 240
-s.fraction;       // {1, 1, 0.6667}  — in the original item order
+s.fraction;       // {1, 1, 0.6667}  — in the order the items were given
 s.order;          // {0, 1, 2}       — items by decreasing density
 
 double ub = knapsack::fractional_upper_bound(items, 50);   // bound for 0/1 branch-and-bound
@@ -223,14 +208,14 @@ Malformed instances (non-positive weight, negative value or capacity) raise `std
 
 `tests/test_fractional.cpp` — no framework needed, runs in a quarter of a second:
 
-* textbook instances (CLRS §16.2, the original assignment's example, all-fits, zero capacity, ties,
-  extreme magnitudes, invalid input);
+* textbook instances (CLRS §16.2, the juice example, all-fits, zero capacity, ties, extreme
+  magnitudes, invalid input);
 * **20 000 random instances** (`n ≤ 10`) whose greedy value is compared with an **exhaustive
   enumeration of the LP's vertices** — every vertex of the feasible polytope has at most one
   fractional coordinate, so "every subset taken whole + at most one extra item taken fractionally"
   is a complete search;
-* on every instance: feasibility, at most one fractional item, capacity exhausted when the items
-  do not all fit, non-increasing density order, and `fractional optimum ≥ 0/1 optimum` (with equality
+* on every instance: feasibility, at most one fractional item, capacity exhausted when the items do
+  not all fit, non-increasing density order, and `fractional optimum ≥ 0/1 optimum` (with equality
   whenever the greedy solution is integral).
 
 CI runs the suite with GCC, Clang, MSVC and on macOS.
@@ -245,30 +230,19 @@ CI runs the suite with GCC, Clang, MSVC and on macOS.
 ├── src/main.cpp                      command-line solver (file / stdin / --json / --interactive)
 ├── tests/test_fractional.cpp         unit + randomized tests vs. exhaustive enumeration
 ├── bench/bench.cpp · bench/plot.py   timing and integrality-gap experiments → docs/figures/bench.png
-├── examples/*.txt                    sample instances (CLRS, original assignment, Wikipedia)
+├── examples/*.txt                    sample instances (CLRS, juice, Wikipedia)
 ├── CMakeLists.txt · Makefile · .github/workflows/ci.yml
 └── LICENSE (MIT)
 ```
 
 ---
 
-## History
-
-The first version was a single 77-line file written for the course. This release keeps its
-algorithm and fixes what was wrong around it: the prompt asked for *volume then happiness* but the
-values were stored the other way round (so the documented example printed 166.7 instead of 0.6);
-the array was released with `delete` instead of `delete[]`; a zero-volume item divided by zero; and
-only the optimal value — not the plan — was reported.
-
----
-
 ## References
 
-1. T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, *Introduction to Algorithms*, 4th ed.,
-   §16.2 "Elements of the greedy strategy" (fractional vs. 0-1 knapsack).
-2. G. B. Dantzig, "Discrete-Variable Extremum Problems", *Operations Research* 5(2), 1957 —
-   the origin of the density-ordering bound.
-3. H. Kellerer, U. Pferschy, D. Pisinger, *Knapsack Problems*, Springer, 2004.
+1. T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein, *Introduction to Algorithms*, 3rd ed.,
+   §16.2 ("Elements of the greedy strategy").
+2. S. Martello, P. Toth, *Knapsack Problems: Algorithms and Computer Implementations*, Wiley, 1990.
+3. D. Pisinger, "Where are the hard knapsack problems?", *Computers & Operations Research* 32(9), 2005.
 
 ---
 
